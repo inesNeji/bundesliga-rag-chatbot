@@ -1,0 +1,128 @@
+2026-01-10 19:15:22,164 | INFO | __main__ | [USER] who is the coach for berlin?
+2026-01-10 19:15:22,165 | INFO | __main__ | Recognized entity: berlin
+2026-01-10 19:15:22,165 | INFO | __main__ | [ENTITY] berlin
+2026-01-10 19:15:22,165 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:15:23,198 | INFO | __main__ | [SPARQL] Returned 16 rows
+2026-01-10 19:15:23,199 | INFO | __main__ | Loaded 18 city aliases for Bundesliga clubs
+2026-01-10 19:15:23,200 | INFO | __main__ | [CLUB LOOKUP] ['wolfsburg', 'mönchengladbach', 'leverkusen', 'cologne', 'mainz', 'freiburg im breisgau', 'stuttgart', 'hamburg', 'pauli', 'st. pauli', 'munich', 'sinsheim', 'frankfurt', 'dortmund', 'bremen', 'leipzig', 'berlin', 'heidenheim an der brenz']
+2026-01-10 19:15:23,200 | INFO | __main__ | [CLUB] 1. FC Union Berlin (Q141971)
+2026-01-10 19:15:23,201 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:15:24,012 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:15:24,014 | ERROR | __main__ | [PIPELINE FAILED]
+Traceback (most recent call last):
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 267, in handle_user_query
+    coach_name, coach_info = get_current_coach(club["qid"])
+                             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 175, in get_current_coach
+    logger.info(f"[WIKI] Loaded article: {title}")
+                                          ^^^^^
+UnboundLocalError: cannot access local variable 'title' where it is not associated with a value
+2026-01-10 19:16:03,236 | INFO | __main__ | [USER] Who is the coach of Hamburg?
+2026-01-10 19:16:03,236 | INFO | __main__ | Recognized entity: hamburg
+2026-01-10 19:16:03,236 | INFO | __main__ | [ENTITY] hamburg
+2026-01-10 19:16:03,236 | INFO | __main__ | [CLUB LOOKUP] ['wolfsburg', 'mönchengladbach', 'leverkusen', 'cologne', 'mainz', 'freiburg im breisgau', 'stuttgart', 'hamburg', 'pauli', 'st. pauli', 'munich', 'sinsheim', 'frankfurt', 'dortmund', 'bremen', 'leipzig', 'berlin', 'heidenheim an der brenz']
+2026-01-10 19:16:03,236 | INFO | __main__ | [CLUB] FC St. Pauli (Q6463)
+2026-01-10 19:16:03,236 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:16:03,386 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:16:03,387 | ERROR | __main__ | [PIPELINE FAILED]
+Traceback (most recent call last):
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 267, in handle_user_query
+    coach_name, coach_info = get_current_coach(club["qid"])
+                             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 175, in get_current_coach
+    logger.info(f"[WIKI] Loaded article: {title}")
+                                          ^^^^^
+UnboundLocalError: cannot access local variable 'title' where it is not associated with a value
+2026-01-10 19:17:59,158 | INFO | __main__ | [USER] Who is the coach of Hamburg?
+2026-01-10 19:17:59,159 | INFO | __main__ | Recognized entity: hamburg
+2026-01-10 19:17:59,159 | INFO | __main__ | [ENTITY] hamburg
+2026-01-10 19:17:59,159 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:17:59,669 | INFO | __main__ | [SPARQL] Returned 16 rows
+2026-01-10 19:17:59,669 | INFO | __main__ | Loaded 18 city aliases for Bundesliga clubs
+2026-01-10 19:17:59,669 | INFO | __main__ | [CLUB LOOKUP] ['wolfsburg', 'mönchengladbach', 'leverkusen', 'cologne', 'mainz', 'freiburg im breisgau', 'stuttgart', 'hamburg', 'pauli', 'st. pauli', 'munich', 'sinsheim', 'frankfurt', 'dortmund', 'bremen', 'leipzig', 'berlin', 'heidenheim an der brenz']
+2026-01-10 19:17:59,669 | INFO | __main__ | [CLUB] FC St. Pauli (Q6463)
+2026-01-10 19:17:59,670 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:17:59,699 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:17:59,699 | INFO | __main__ | [COACH] Alexander Blessin
+2026-01-10 19:17:59,700 | INFO | __main__ | [WIKI] Fetching article: Alexander Blessin
+2026-01-10 19:18:00,346 | INFO | __main__ | [WIKI] Loaded 135 characters
+2026-01-10 19:18:00,346 | INFO | __main__ | [COACH] Alexander Blessin
+2026-01-10 19:18:00,347 | INFO | __main__ | [BIO] 135 characters
+2026-01-10 19:18:00,347 | INFO | __main__ | [PROMPT] 405 characters
+2026-01-10 19:18:08,588 | INFO | __main__ | [USER] Who is the coach of Berlin?
+2026-01-10 19:18:08,589 | INFO | __main__ | Recognized entity: berlin
+2026-01-10 19:18:08,589 | INFO | __main__ | [ENTITY] berlin
+2026-01-10 19:18:08,589 | INFO | __main__ | [CLUB LOOKUP] ['wolfsburg', 'mönchengladbach', 'leverkusen', 'cologne', 'mainz', 'freiburg im breisgau', 'stuttgart', 'hamburg', 'pauli', 'st. pauli', 'munich', 'sinsheim', 'frankfurt', 'dortmund', 'bremen', 'leipzig', 'berlin', 'heidenheim an der brenz']
+2026-01-10 19:18:08,589 | INFO | __main__ | [CLUB] 1. FC Union Berlin (Q141971)
+2026-01-10 19:18:08,590 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:18:08,618 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:18:08,619 | INFO | __main__ | [COACH] Steffen Baumgart
+2026-01-10 19:18:08,619 | INFO | __main__ | [WIKI] Fetching article: Steffen Baumgart
+2026-01-10 19:18:08,761 | INFO | __main__ | [WIKI] Loaded 140 characters
+2026-01-10 19:18:08,762 | INFO | __main__ | [COACH] Steffen Baumgart
+2026-01-10 19:18:08,762 | INFO | __main__ | [BIO] 140 characters
+2026-01-10 19:18:08,762 | INFO | __main__ | [PROMPT] 414 characters
+2026-01-10 19:18:17,460 | INFO | __main__ | [USER] Who is the coach of munich?
+2026-01-10 19:18:17,461 | INFO | __main__ | Recognized entity: munich
+2026-01-10 19:18:17,461 | INFO | __main__ | [ENTITY] munich
+2026-01-10 19:18:17,461 | INFO | __main__ | [CLUB LOOKUP] ['wolfsburg', 'mönchengladbach', 'leverkusen', 'cologne', 'mainz', 'freiburg im breisgau', 'stuttgart', 'hamburg', 'pauli', 'st. pauli', 'munich', 'sinsheim', 'frankfurt', 'dortmund', 'bremen', 'leipzig', 'berlin', 'heidenheim an der brenz']
+2026-01-10 19:18:17,461 | INFO | __main__ | [CLUB] FC Bayern Munich (Q15789)
+2026-01-10 19:18:17,462 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:18:17,618 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:18:17,618 | INFO | __main__ | [COACH] Vincent Kompany
+2026-01-10 19:18:17,618 | INFO | __main__ | [WIKI] Fetching article: Vincent Kompany
+2026-01-10 19:18:17,764 | INFO | __main__ | [WIKI] Loaded 2120 characters
+2026-01-10 19:18:17,765 | INFO | __main__ | [COACH] Vincent Kompany
+2026-01-10 19:18:17,766 | INFO | __main__ | [BIO] 2120 characters
+2026-01-10 19:18:17,766 | INFO | __main__ | [PROMPT] 2391 characters
+2026-01-10 19:19:16,707 | INFO | __main__ | [USER] Who is the coach of cologne?
+2026-01-10 19:19:16,707 | ERROR | __main__ | [PIPELINE FAILED]
+Traceback (most recent call last):
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 254, in handle_user_query
+    entity = extract_city_or_club(user_query)
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 145, in extract_city_or_club
+    raise ValueError("No Bundesliga city or club recognized")
+ValueError: No Bundesliga city or club recognized
+2026-01-10 19:28:52,127 | ERROR | __main__ | [PIPELINE FAILED]
+Traceback (most recent call last):
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 191, in handle_user_query
+    entity = extract_city_or_club(query)
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 112, in extract_city_or_club
+    raise ValueError("No club or city detected")
+ValueError: No club or city detected
+2026-01-10 19:29:10,786 | INFO | __main__ | Recognized entity: munich
+2026-01-10 19:29:10,787 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:29:11,669 | INFO | __main__ | [SPARQL] Returned 16 rows
+2026-01-10 19:29:11,669 | INFO | __main__ | Loaded 18 city aliases for Bundesliga clubs
+2026-01-10 19:29:11,670 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:29:11,827 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:29:11,827 | INFO | __main__ | [COACH] Vincent Kompany
+2026-01-10 19:29:12,620 | INFO | __main__ | [WIKI] 600 chars
+2026-01-10 19:37:30,124 | ERROR | __main__ | [PIPELINE FAILED]
+Traceback (most recent call last):
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 199, in handle_user_query
+    entity = extract_city_or_club(user_query)
+  File "C:\Users\Ines\Desktop\pantopix-coding-challenge\main.py", line 107, in extract_city_or_club
+    words = re.findall(r"\b[a-zäöüß\.]+\b", query)
+                                            ^^^^^
+NameError: name 'query' is not defined
+2026-01-10 19:40:14,532 | INFO | __main__ | No recognizable Bundesliga entity found
+2026-01-10 19:40:28,551 | INFO | __main__ | No recognizable Bundesliga entity found
+2026-01-10 19:40:37,181 | INFO | __main__ | Recognized entity: pauli
+2026-01-10 19:40:37,181 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:40:38,389 | INFO | __main__ | [SPARQL] Returned 16 rows
+2026-01-10 19:40:38,390 | INFO | __main__ | Loaded 18 city aliases for Bundesliga clubs
+2026-01-10 19:40:38,390 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:40:38,545 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:40:38,545 | INFO | __main__ | [COACH] Alexander Blessin
+2026-01-10 19:40:39,760 | INFO | __main__ | [WIKI] 135 chars
+2026-01-10 19:40:50,375 | INFO | __main__ | Recognized entity: munich
+2026-01-10 19:40:50,376 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:40:50,582 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:40:50,583 | INFO | __main__ | [COACH] Vincent Kompany
+2026-01-10 19:40:50,730 | INFO | __main__ | [WIKI] 600 chars
+2026-01-10 19:40:59,946 | INFO | __main__ | Recognized entity: cologne
+2026-01-10 19:40:59,947 | INFO | __main__ | [SPARQL] Sending query
+2026-01-10 19:41:00,104 | INFO | __main__ | [SPARQL] Returned 1 rows
+2026-01-10 19:41:00,104 | INFO | __main__ | [COACH] Lukas Kwasniok
+2026-01-10 19:41:00,278 | INFO | __main__ | [WIKI] 154 chars
