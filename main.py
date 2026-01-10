@@ -3,17 +3,17 @@ import re
 import logging
 import sys
 from functools import lru_cache
-from typing import Dict, Tuple, Optional
+from typing import Dict
 
 # ============================================================
-# LOGGING SETUP
+# LOGGING
 # ============================================================
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(message)s",
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     handlers=[
-        logging.FileHandler("logs/debug.log"),
+        logging.FileHandler("logs/debug.log", encoding="utf-8"),
         logging.StreamHandler(sys.stdout),
     ],
 )
@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ============================================================
-# HTTP SESSION (reuse connection for performance)
+# HTTP SESSION
 # ============================================================
 
 SESSION = requests.Session()
@@ -33,49 +33,38 @@ WIKIDATA_ENDPOINT = "https://query.wikidata.org/sparql"
 WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php"
 
 # ============================================================
-# WIKIDATA HELPERS
+# WIKIDATA QUERY
 # ============================================================
 
 def query_wikidata(sparql_query: str) -> list:
-    """
-    Execute a SPARQL query against Wikidata and return bindings.
-
-    Args:
-        sparql_query (str): SPARQL query string
-
-    Returns:
-        list: SPARQL result bindings (empty list on failure)
-    """
     try:
+        logger.info("[SPARQL] Sending query")
         response = SESSION.get(
             WIKIDATA_ENDPOINT,
             params={"query": sparql_query, "format": "json"},
             timeout=10,
         )
         response.raise_for_status()
-        logger.info("SPARQL query successful")
-        return response.json()["results"]["bindings"]
 
-    except requests.RequestException as exc:
-        logger.error(f"Wikidata query failed: {exc}")
+        data = response.json()
+        rows = data["results"]["bindings"]
+        logger.info(f"[SPARQL] Returned {len(rows)} rows")
+        return rows
+
+    except Exception as exc:
+        logger.error(f"[SPARQL] Failed: {exc}")
         return []
 
 # ============================================================
-# BUNDESLIGA DATA
+# CLUB DATA
 # ============================================================
 
 @lru_cache(maxsize=1)
 def get_current_bundesliga_clubs() -> Dict[str, Dict[str, str]]:
-    """
-    Fetch all current Bundesliga clubs and map them to city keywords.
-
-    Returns:
-        dict: {city_key -> {name, qid}}
-    """
     query = """
     SELECT ?team ?teamLabel ?cityLabel WHERE {
-      ?team wdt:P31 wd:Q476028 ;   # instance of football club
-            wdt:P118 wd:Q82595 ;   # league: Bundesliga
+      ?team wdt:P31 wd:Q476028 ;
+            wdt:P118 wd:Q82595 ;
             wdt:P159 ?city .
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
     }
@@ -85,21 +74,19 @@ def get_current_bundesliga_clubs() -> Dict[str, Dict[str, str]]:
     mapping: Dict[str, Dict[str, str]] = {}
 
     for row in results:
-        club_name = row["teamLabel"]["value"]
-        club_qid = row["team"]["value"].split("/")[-1]
-        city = row.get("cityLabel", {}).get("value", "").lower()
+        club = row["teamLabel"]["value"]
+        qid = row["team"]["value"].split("/")[-1]
+        city = row["cityLabel"]["value"].lower()
 
-        club_info = {"name": club_name, "qid": club_qid}
+        club_info = {"name": club, "qid": qid}
 
-        if city:
-            mapping[city] = club_info
+        mapping[city] = club_info
 
-        # Special handling for common aliases
-        if "pauli" in club_name.lower():
+        if "pauli" in club.lower():
             mapping["pauli"] = club_info
             mapping["st. pauli"] = club_info
 
-        if "hamburg" in city or "hamburg" in club_name.lower():
+        elif "hamburg" in club.lower():
             mapping["hamburg"] = club_info
 
     logger.info(f"Loaded {len(mapping)} city aliases for Bundesliga clubs")
@@ -109,54 +96,36 @@ def get_current_bundesliga_clubs() -> Dict[str, Dict[str, str]]:
 # ENTITY EXTRACTION
 # ============================================================
 
-def extract_city_or_club(user_query: str) -> str:
+KNOWN_ENTITIES = {
+    "berlin","hamburg","munich","münchen","cologne","köln",
+    "dortmund","frankfurt","leipzig","bremen","stuttgart",
+    "mainz","freiburg","wolfsburg","leverkusen","heidenheim",
+    "pauli","st. pauli, Konstanz, constance, fc st. pauli, fc st pauli,lindau, lindau im bodensee, bodensee, fc lindau, fc lindau 04, fc lindau 04 e.v.",
+}
+
+def extract_city_or_club(user_query: str) -> str | None:
     """
-    Extract a known city or club keyword from the user query.
-
-    Args:
-        user_query (str): Raw user input
-
-    Returns:
-        str: extracted keyword
-
-    Raises:
-        ValueError: if no entity could be identified
+    Try to extract a known city or club keyword from the user query.
+    Returns None if nothing is recognized.
     """
-    query = user_query.lower()
+    query_lower = user_query.lower()
 
-    known_entities = {
-        "berlin",
-        "munich",
-        "münchen",
-        "heidenheim",
-        "hamburg",
-        "pauli",
-        "st. pauli",
-    }
-
-    words = re.findall(r"\b[a-zäöüß\.]+\b", query)
+    words = re.findall(r"\b[a-zäöüß\.]+\b", query_lower)
 
     for word in words:
-        if word in known_entities:
+        if word in KNOWN_ENTITIES:
             logger.info(f"Recognized entity: {word}")
             return word
 
-    raise ValueError("No Bundesliga city or club recognized")
+    logger.info("No recognizable Bundesliga entity found")
+    return None
+
 
 # ============================================================
-# COACH INFORMATION
+# COACH + WIKIPEDIA
 # ============================================================
 
-def get_current_coach(club_qid: str) -> Tuple[Optional[str], str]:
-    """
-    Retrieve the current head coach of a Bundesliga club.
-
-    Args:
-        club_qid (str): Wikidata Q-ID of the club
-
-    Returns:
-        tuple: (coach_name | None, coach_background_text)
-    """
+def get_current_coach(club_qid: str):
     query = f"""
     SELECT ?coach ?coachLabel ?article WHERE {{
       wd:{club_qid} p:P286 ?statement .
@@ -170,18 +139,20 @@ def get_current_coach(club_qid: str) -> Tuple[Optional[str], str]:
     }} LIMIT 1
     """
 
-    results = query_wikidata(query)
+    rows = query_wikidata(query)
 
-    if not results:
-        return None, "No current coach information found."
+    if not rows:
+        return None, "No current coach found."
 
-    coach_name = results[0]["coachLabel"]["value"]
-    article_url = results[0].get("article", {}).get("value")
+    coach = rows[0]["coachLabel"]["value"]
+    article = rows[0].get("article", {}).get("value")
 
-    if not article_url:
-        return coach_name, "No background information available."
+    logger.info(f"[COACH] {coach}")
 
-    title = article_url.split("/")[-1].replace("_", " ")
+    if not article:
+        return coach, "No Wikipedia article available."
+
+    title = article.split("/")[-1]
 
     try:
         response = SESSION.get(
@@ -197,126 +168,101 @@ def get_current_coach(club_qid: str) -> Tuple[Optional[str], str]:
             timeout=10,
         )
         response.raise_for_status()
+
         pages = response.json()["query"]["pages"]
-        extract = next(iter(pages.values())).get("extract", "")
-        return coach_name, extract.strip() or "No intro text available."
+        text = next(iter(pages.values())).get("extract", "")
 
-    except requests.RequestException as exc:
-        logger.error(f"Wikipedia request failed: {exc}")
-        return coach_name, "Could not retrieve coach background."
+        text = text[:600]   # hard cap to avoid giant prompts
+        logger.info(f"[WIKI] {len(text)} chars")
+
+        return coach, text or "No summary available."
+
+    except Exception as exc:
+        logger.error(f"[WIKI] Failed: {exc}")
+        return coach, "Wikipedia fetch failed."
 
 # ============================================================
-# PROMPT CONSTRUCTION (RAG OUTPUT)
+# PROMPT
 # ============================================================
 
-def build_llm_prompt(
-    user_query: str, club: str, coach: str, coach_info: str
-) -> str:
-    """
-    Build the final prompt for the LLM.
-
-    Returns:
-        str: Prompt text
-    """
-    system_prompt = (
-        "You are a helpful assistant specialized in German 1. Bundesliga football. "
-        "Answer concisely and factually using only the provided context."
-    )
-
-    context = (
-        f"Club: {club}\n"
-        f"Current coach: {coach}\n"
-        f"About the coach: {coach_info}"
-    )
-
+def build_llm_prompt(user, club, coach, info):
     return (
-        f"{system_prompt}\n\n"
-        f"Context:\n{context}\n\n"
-        f"User question: {user_query}\n"
-        f"Answer:"
+        "You are a helpful assistant specialized in German Bundesliga football.\n\n"
+        f"Context:\nClub: {club}\nCoach: {coach}\nAbout: {info}\n\n"
+        f"User question: {user}\nAnswer:"
     )
 
 # ============================================================
-# MAIN PROCESSING PIPELINE
+# PIPELINE
 # ============================================================
 
 def handle_user_query(user_query: str) -> str:
     """
-    Full pipeline:
-    - extract entity
-    - map to club
-    - fetch coach info
-    - build LLM prompt
+    Process a user query to extract a Bundesliga club, retrieve its current coach,
+    and build a RAG-style LLM prompt. Handles unknown clubs gracefully.
     """
     try:
+        # Try to extract a known city or club from the query
         entity = extract_city_or_club(user_query)
+
+        # If no recognizable entity found, return polite fallback
+        if not entity:
+            return build_llm_prompt(
+                user_query,
+                "Unknown",
+                "Unknown",
+                "I'm sorry, we don't know who you mean."
+            )
+
+        # Load current Bundesliga clubs
         clubs = get_current_bundesliga_clubs()
 
+        # If entity not in our mapping, return polite fallback
         if entity not in clubs:
             return build_llm_prompt(
                 user_query,
                 "Unknown",
                 "Unknown",
-                f"No current Bundesliga club found for '{entity}'.",
+                "I'm sorry, we don't know who you mean."
             )
 
+        # Retrieve club info and current coach
         club = clubs[entity]
         coach_name, coach_info = get_current_coach(club["qid"])
 
+        # Build final LLM prompt
         return build_llm_prompt(
             user_query,
             club["name"],
             coach_name or "Unknown",
-            coach_info,
+            coach_info
         )
 
     except Exception:
-        logger.exception("Unexpected processing error")
+        logger.exception("[PIPELINE FAILED]")
         return build_llm_prompt(
             user_query,
             "Error",
             "Error",
-            "An internal error occurred while retrieving data.",
+            "Internal error occurred while processing your query."
         )
 
 # ============================================================
-# CHAT CONSOLE (CLI)
+# CLI
 # ============================================================
 
-def run_chat_console() -> None:
-    """
-    Interactive command-line chat interface.
-    """
-    print("=" * 60)
-    print("⚽ Bundesliga Coach RAG Chatbot")
-    print("Ask questions like:")
-    print("  - Who is the coach of Hamburg?")
-    print("  - Tell me about the coach in Munich")
-    print("Type 'exit' or 'quit' to leave.")
-    print("=" * 60)
+def run_chat_console():
+    print("⚽ Bundesliga Coach RAG\nType 'exit' to quit")
 
     while True:
-        try:
-            user_input = input("\n> ").strip()
-            if user_input.lower() in {"exit", "quit"}:
-                print("\nGoodbye 👋")
-                break
-
-            if not user_input:
-                continue
-
-            prompt = handle_user_query(user_input)
-            print("\n--- Generated LLM Prompt ---\n")
-            print(prompt)
-            print("\n" + "-" * 60)
-
-        except KeyboardInterrupt:
-            print("\n\nInterrupted. Goodbye 👋")
+        q = input("\n> ").strip()
+        if q.lower() in {"exit","quit"}:
             break
 
-# ============================================================
-# ENTRY POINT
-# ============================================================
+        prompt = handle_user_query(q)
+        print("\n--- Generated Prompt ---\n")
+        print(prompt)
+        print("\n" + "-"*50)
 
 if __name__ == "__main__":
     run_chat_console()
