@@ -198,8 +198,7 @@ def build_llm_prompt(user, club, coach, info):
 
 def handle_user_query(user_query: str) -> str:
     """
-    Process a user query to extract a Bundesliga club, retrieve its current coach,
-    and build a RAG-style LLM prompt. Handles unknown clubs gracefully.
+    Process a user query to extract a Bundesliga club, retrieve its current coach.
     """
     try:
         # Try to extract a known city or club from the query
@@ -211,7 +210,7 @@ def handle_user_query(user_query: str) -> str:
                 user_query,
                 "Unknown",
                 "Unknown",
-                "I'm sorry, we don't know who you mean."
+                "I'm sorry, we don't know who you mean, try to be more precise :)."
             )
 
         # Load current Bundesliga clubs
@@ -223,7 +222,7 @@ def handle_user_query(user_query: str) -> str:
                 user_query,
                 "Unknown",
                 "Unknown",
-                "I'm sorry, we don't know who you mean."
+                "I'm sorry, we don't know who you mean, try to be more precise :) ."
             )
 
         # Retrieve club info and current coach
@@ -252,7 +251,7 @@ def handle_user_query(user_query: str) -> str:
 # ============================================================
 
 def run_chat_console():
-    print("⚽ Bundesliga Coach RAG\nType 'exit' to quit")
+    print("⚽ ⚽⚽ Bundesliga Coach RAG\nType 'exit' to quit")
 
     while True:
         q = input("\n> ").strip()
