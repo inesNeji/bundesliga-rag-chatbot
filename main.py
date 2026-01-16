@@ -100,7 +100,7 @@ KNOWN_ENTITIES = {
     "berlin","hamburg","munich","münchen","cologne","köln",
     "dortmund","frankfurt","leipzig","bremen","stuttgart",
     "mainz","freiburg","wolfsburg","leverkusen","heidenheim",
-    "pauli","st. pauli, Konstanz, constance, fc st. pauli, fc st pauli,lindau, lindau im bodensee, bodensee, fc lindau, fc lindau 04, fc lindau 04 e.v.",
+    "pauli","st. pauli", "Konstanz", "constance", "fc st. pauli", "fc st pauli,lindau", "lindau im bodensee", "bodensee", "fc lindau", "fc lindau 04", "fc lindau 04 e.v.",
 }
 
 def extract_city_or_club(user_query: str) -> str | None:
