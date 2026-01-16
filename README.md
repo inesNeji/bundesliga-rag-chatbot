@@ -1,4 +1,3 @@
-# bundesliga-rag-chatbot
 # Bundesliga Coach RAG Chatbot
 
 Python script for a hypothetical RAG chatbot that answers questions about current coaches of 1. Bundesliga clubs using **Wikidata** (SPARQL) and **Wikipedia**.
